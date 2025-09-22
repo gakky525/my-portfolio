@@ -7,6 +7,7 @@ type Props = {
   params: Promise<{ category: string }>;
 };
 
+// 科目名を日本語に変換する関数
 const getCategoryLabel = (category: string) =>
   category === 'anatomy' ? '解剖学' : '生理学';
 
@@ -42,10 +43,12 @@ export async function generateMetadata(
   };
 }
 
+// ビルド時に解剖学、生理学のページを静的生成
 export function generateStaticParams() {
   return [{ category: 'anatomy' }, { category: 'physiology' }];
 }
 
+// ページを静的生成
 export const dynamic = 'error';
 
 export default async function SubjectPage({ params }: Props) {
@@ -53,7 +56,7 @@ export default async function SubjectPage({ params }: Props) {
   const fields = subjects[category as keyof typeof subjects];
   const categoryLabel = getCategoryLabel(category);
 
-  if (!fields) return notFound();
+  if (!fields) return notFound(); // 存在しなければ404エラー
 
   return (
     <main className='p-6 flex flex-col items-center min-h-screen'>

@@ -17,6 +17,7 @@ export default function ReviewPage() {
   const MAX_QUESTIONS = 100;
   const isOverLimit = questions.length >= MAX_QUESTIONS;
 
+  // 初回レンダリング時に localStorage から保存済みの問題を取得
   useEffect(() => {
     try {
       const stored = localStorage.getItem('incorrectQuestions');
@@ -31,11 +32,13 @@ export default function ReviewPage() {
     }
   }, []);
 
+  // ゴミ箱アイコンを押したときに削除ダイアログを開く
   const confirmDelete = (id: number) => {
     setTargetId(id);
     setOpen(true);
   };
 
+  // 特定の問題を削除して状態更新＋localStorage更新
   const handleDelete = () => {
     if (targetId === null) return;
     const updated = questions.filter((q) => q.id !== targetId);
@@ -45,6 +48,7 @@ export default function ReviewPage() {
     setTargetId(null);
   };
 
+  // 全削除（localStorageも更新）
   const handleDeleteAll = () => {
     setQuestions([]);
     localStorage.removeItem('incorrectQuestions');

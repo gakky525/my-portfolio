@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ReviewPage from './ReviewClient';
 
+// ページを静的生成
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {

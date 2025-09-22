@@ -15,23 +15,25 @@ export default function QuestionDisplay({
   field: string;
 }) {
   const router = useRouter();
-  const [question, setQuestion] = useState<Question | null>(initialQuestion);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showLimitNotice, setShowLimitNotice] = useState(false);
-  const [fadeClass, setFadeClass] = useState<'fade-in' | 'fade-out'>('fade-in');
+  const [question, setQuestion] = useState<Question | null>(initialQuestion); // 表示する問題
+  const [selected, setSelected] = useState<number | null>(null); // 選んだ選択肢のID
+  const [showLimitNotice, setShowLimitNotice] = useState(false); // 復習リストの上限通知
+  const [fadeClass, setFadeClass] = useState<'fade-in' | 'fade-out'>('fade-in'); // アニメーション用クラス
   const [isLoadingNext, setIsLoadingNext] = useState(false);
+  // 直近出した問題のID（連続表示回避用）
   const [excludeHistory, setExcludeHistory] = useState<number[]>([
     initialQuestion.id,
   ]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // APIエラーなどのメッセージ
 
-  const hasShownNoticeRef = useRef(false);
-  const isFirstRenderRef = useRef(true);
+  const hasShownNoticeRef = useRef(false); // 上限通知をすでに表示したかを保持
+  const isFirstRenderRef = useRef(true); // 初回レンダリングの扱い
 
   const selectedChoice = question?.choices.find((c) => c.id === selected);
   const isCorrect = selectedChoice?.isCorrect;
   const correctChoice = question?.choices.find((c) => c.isCorrect);
 
+  // 不正解だった問題をlocalStorageに保存するための関数
   const saveIncorrectQuestion = (q: Question) => {
     const existing: Question[] = JSON.parse(
       localStorage.getItem('incorrectQuestions') || '[]'
@@ -51,7 +53,9 @@ export default function QuestionDisplay({
     localStorage.setItem('incorrectQuestions', JSON.stringify(updated));
   };
 
+  // 不正解の問題をブラウザに保存
   useEffect(() => {
+    // 初回レンダリング時はuseEffectをスキップ
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
       return;
@@ -67,6 +71,7 @@ export default function QuestionDisplay({
     }
   }, [selected, selectedChoice, question]);
 
+  // エラーメッセージを表示後、数秒後に消す
   useEffect(() => {
     if (errorMessage) {
       const timer = setTimeout(() => setErrorMessage(null), 5000);
@@ -74,25 +79,29 @@ export default function QuestionDisplay({
     }
   }, [errorMessage]);
 
+  // ユーザーが答えを選ぶときに使用する関数
   const handleSelect = (id: number) => {
     if (selected === null) {
       setSelected(id);
     }
   };
 
+  // 分野選択ページに戻る
   const handleBack = () => {
     router.push(`/subjects/${category}`);
   };
 
+  // 次の問題を取得
   const handleNext = async () => {
     setFadeClass('fade-out');
     setIsLoadingNext(true);
 
     const nextExcludeIds = [...excludeHistory];
-    if (question) nextExcludeIds.push(question.id);
-    const trimmedExcludeIds = nextExcludeIds.slice(-5);
+    if (question) nextExcludeIds.push(question.id); // 今の問題を履歴に追加
+    const trimmedExcludeIds = nextExcludeIds.slice(-5); // 直近5問だけ保持（古いのは切り捨て）
 
     try {
+      // 次の問題を取得できたらセットしてUI更新
       const res = await fetch('/api/questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

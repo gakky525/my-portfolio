@@ -3,16 +3,18 @@ import QuestionDisplay from '@/components/quiz/QuestionDisplay';
 import Link from 'next/link';
 import type { Metadata, ResolvingMetadata } from 'next';
 
+// キャッシュを無効化し、毎回サーバーで処理を実行（毎回ランダムに問題を出す）
 export const dynamic = 'force-dynamic';
 
 type Props = {
   params: Promise<{ category: string; field: string }>;
 };
 
+// 表示用ラベル変換
 function getCategoryAndFieldLabels(category: string, field: string) {
   const categoryLabel = category === 'anatomy' ? '解剖学' : '生理学';
-  const decodedField = decodeURIComponent(field);
-  const fieldLabel = decodedField === 'all' ? '全分野' : decodedField;
+  const decodedField = decodeURIComponent(field); // URLエンコードされた文字列を元に戻す
+  const fieldLabel = decodedField === 'all' ? '全分野' : decodedField; // fieldが'all'の時は「全分野」として表示
   return { categoryLabel, fieldLabel, decodedField };
 }
 
@@ -58,6 +60,7 @@ export default async function QuestionPage({ params }: Props) {
   );
   const question = await getRandomQuestion(category, decodedField);
 
+  // 分野に問題が存在しない場合の処理
   if (!question) {
     return (
       <main className='flex flex-col items-center justify-center min-h-screen space-y-6 text-center'>
