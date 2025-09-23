@@ -72,7 +72,7 @@ PC / スマホ両対応です。アカウント登録不要で今すぐ利用で
 | Backend        | Next.js Server Actions、TypeScript                | 状況に応じて使い分け、パフォーマンスの最適化を実施           |
 | Database       | Supabase（PostgreSQL）、Prisma                    | クラウド DB として Supabase を利用し、型安全な Prisma を併用 |
 | Infrastructure | Vercel                                            | GitHub 連携により、プッシュ時に自動でデプロイ                |
-| etc            | ESLint、OGP 設定、git、gitHub                     | SEO 対応のための OGP 設定も実装                              |
+| etc            | OGP 設定、git、gitHub                             | SEO 対応のための OGP 設定も実装                              |
 
 > Supabase の手軽さと Prisma の型安全性を両立する設計に挑戦しました。Next.js App Router で柔軟なルーティングとパフォーマンス最適化も実装しています。
 
@@ -87,65 +87,50 @@ PC / スマホ両対応です。アカウント登録不要で今すぐ利用で
 ## ディレクトリ構成（一部抜粋）
 
 ```
-./
-├── prisma/ # Prisma設定ファイル
-│   ├── migrations/
-│   └── schema.prisma
-├── public/ # 静的ファイル（OGP画像やスクリーンショットなど）
-│   ├── favicon.ico
-│   └── screenshots/
+/
+├── prisma/ # Prisma の設定ファイル
+│ └── migrations/
+│ └── schema.prisma
+├── public/ # 静的ファイル（OGP画像、スクリーンショットなど）
+│ └── screenshots/
+│ └── favicon.ico など
 ├── src/ # ソースコードのルート
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── questions/
-│   │   │       └── route.ts # apiルートハンドラ
-│   │   ├── questions/
-│   │   │   └── [category]/
-│   │   │       └── [field]/
-│   │   │           └── page.tsx # 問題出題ページ
-│   │   ├── subjects/
-│   │   │    └── [category]/
-│   │   │        └── page.tsx # 分野選択ページ
-│   │   ├── review/
-│   │   │   ├── page.tsx # 復習ページ
-│   │   │   └── ReviewClient.tsx
-│   │   ├── page.tsx
-│   │   ├── layout.tsx
-│   │   ├── LayoutWrapper.tsx
-│   │   ├── error.tsx
-│   │   ├── loading.tsx
-│   │   ├── not-found.tsx
-│   │   ├── robots.ts
-│   │   └── sitemap.ts
-│   ├── assets/
-│   │   └── globals.css
-│   ├── components/ # 再利用可能なUIコンポーネント群
-│   │   ├── ConfirmDialog.tsx
-│   │   ├── LoadingUi.tsx
-│   │   ├── quiz/
-│   │   │   └── QuestionDisplay.tsx
-│   │   └── ui/
-│   │       ├── button.tsx
-│   │       └── dialog.tsx
-│   ├── lib/
-│   │   ├── prisma.ts # Prisma クライアント初期化
-│   │   ├── quiz/
-│   │   │   └── getRandomQuestion.ts # クイズ出題関連の処理
-│   │   ├── subjects.ts # 科目や分野の一覧・ラベル定義
-│   │   └── utils.ts
-│   └── types/
-│       └── questions.ts # 問題オブジェクトの型情報
-├── .env
-├── .gitignore
-├── components.json
-├── eslint.config.mjs
-├── next-env.d.ts
-├── next.config.ts
-├── package-lock.json
-├── package.json
-├── postcss.config.mjs
-├── README.md
-└── tsconfig.json
+│ ├── app/ # App Router のルーティング
+│ │ ├── api/questions
+│ │ │ └── route.ts # apiエンドポイント（ルートハンドラ）
+│ │ ├── questions/[category]/[field]
+│ │ │ └── page.tsx # 問題出題ページ
+│ │ ├── review/
+│ │ │ └── page.tsx # 復習ページ
+│ │ │ └── ReviewClient.tsx # クライアントコンポーネント
+│ │ ├── subjects/[category]/
+│ │ │ └── page.tsx # 分野選択ページ
+│ │ ├── layout.tsx # アプリ全体のレイアウト
+│ │ ├── page.tsx # ホーム画面
+│ │ ├── robots.ts # SEO最適化
+│ │ ├── sitemap.ts #SEO最適化
+│ │ └── ... # その他エラーページやローディングページなど
+│ ├── assets/
+│ │ └── global.css
+│ ├── components/ # 再利用可能なUIコンポーネント群
+│ │ ├── QuestionDisplay.tsx
+│ │ ├── button.tsx
+│ │ ├── dialog.tsx
+│ │ ├── ConfirmDialog.tsx
+│ │ └── LoadingUi.tsx
+│ ├── lib/ # 外部サービスや汎用処理ロジック
+│ │ ├── getRandomQuestion.ts # クイズ出題関連の処理
+│ │ ├── prisma.ts # Prisma クライアント初期化
+│ │ ├── subjects.ts # 科目や分野の一覧・ラベル定義
+│ │ └── utils.ts # ユーティリティ関数
+│ └── types/
+│   └── questions.ts # 問題オブジェクトの型情報
+├── .env # 環境変数（Supabaseなどの接続情報）
+├── .gitignore # Git追跡除外ファイル一覧
+├── next.config.js # Next.js の設定ファイル
+├── package.json # 依存関係とスクリプト定義
+├── tsconfig.json # TypeScript の設定
+└── README.md
 ```
 
 ---
@@ -155,5 +140,5 @@ PC / スマホ両対応です。アカウント登録不要で今すぐ利用で
 - ログイン機能の実装（学習履歴・正答率・復習状況を個人に紐づけて保存）
 - 解説の充実化（視覚的に理解できるような画像やイラスト、詳しい論文へのリンクなどの追加）
 - タイマー機能（「20 分間で 20 問」など、時間制限ありの模擬試験形式）
-- 復習機能の改善（復習ページに保存されている問題のみをもう一度出題する機能）
 - ユーザーからのフィードバック機能（各問題に「この問題は不適切です」などのボタンを設置し、報告を受けられる）
+- 病理学などの医療系国家資格で共通科目の問題作成
